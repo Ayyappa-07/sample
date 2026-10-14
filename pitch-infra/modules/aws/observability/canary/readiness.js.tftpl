@@ -1,0 +1,26 @@
+const synthetics = require('Synthetics');
+const log = require('SyntheticsLogger');
+const { URL } = require('url');
+
+const READY_URL = '${ready_url}';
+const p = new URL(READY_URL);
+
+exports.handler = async () => {
+  log.info('Readiness: ' + READY_URL);
+
+  await synthetics.executeHttpStep('readiness', {
+    hostname: p.hostname,
+    path: p.pathname + (p.search || ''),
+    protocol: p.protocol,
+    port: p.port || (p.protocol === 'https:' ? 443 : 80),
+    method: 'GET',
+    headers: {
+      'User-Agent': 'PitchAI-Synthetics-HealthCheck',
+    },
+  }, async (res) => {
+    if (res.statusCode !== 200) {
+      throw new Error('Readiness returned ' + res.statusCode + ' — DB unhealthy');
+    }
+  });
+};
+

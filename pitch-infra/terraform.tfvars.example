@@ -1,0 +1,32 @@
+# =============================================================================
+# Pitch Infrastructure — Example tfvars
+# =============================================================================
+# Usage:
+#   terraform init -backend-config=environments/<env>/backend.hcl
+#   terraform plan -var-file=environments/<env>/terraform.tfvars
+# =============================================================================
+
+environment = "qa"
+region      = "ap-southeast-2"
+
+app_image     = "123456789012.dkr.ecr.ap-southeast-2.amazonaws.com/pitchai-app:latest"
+# app_domain  = "app.pitchai.io"
+
+task_cpu      = 512
+task_memory   = 1024
+desired_count = 2
+max_capacity  = 6
+
+# Graviton/ARM64 instances — ~20% cheaper + faster
+rds_instance_class        = "db.t4g.medium"
+rds_allocated_storage     = 20
+rds_max_allocated_storage = 100
+
+redis_node_type = "cache.t4g.medium"
+
+enable_waf        = false
+enable_cloudfront = false
+# acm_certificate_arn = "arn:aws:acm:ap-southeast-2:123456789012:certificate/abc-123"
+
+alarm_email_endpoints = ["REPLACE_WITH_OPS_EMAIL"]
+monthly_budget_usd    = 500

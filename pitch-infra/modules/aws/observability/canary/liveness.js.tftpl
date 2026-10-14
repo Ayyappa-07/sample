@@ -1,0 +1,26 @@
+const synthetics = require('Synthetics');
+const log = require('SyntheticsLogger');
+const { URL } = require('url');
+
+const HEALTH_URL = '${health_url}';
+const p = new URL(HEALTH_URL);
+
+exports.handler = async () => {
+  log.info('Liveness: ' + HEALTH_URL);
+
+  await synthetics.executeHttpStep('liveness', {
+    hostname: p.hostname,
+    path: p.pathname,
+    protocol: p.protocol,
+    port: p.port || (p.protocol === 'https:' ? 443 : 80),
+    method: 'GET',
+    headers: {
+      'User-Agent': 'PitchAI-Synthetics-HealthCheck',
+    },
+  }, async (res) => {
+    if (res.statusCode !== 200) {
+      throw new Error('Expected 200, got ' + res.statusCode);
+    }
+  });
+};
+
